@@ -1,0 +1,16 @@
+1. Describe the approach and methodology used to generate models, and if applicable indicate what differed in preparation of models to predict a single drug treatment vs drug combination treatment. 300 words or less.
+
+
+
+
+2. Write pseudocode that calculates feature contribution to predictions that could generally be applied to any predictive model. No space limitation.
+
+
+
+
+3. Describe any notable patterns observed when comparing important features, or overall model interpretation, of single agents and combinations of the same agents and suggest possible reasons for such pattern. 300 words or less.
+
+
+
+
+4. There are a staggeringly large number of potential drug combinations. It is highly desirable to use one drug to overcome the resistance to another drug in various cancers, or to identify synergy where the efficacy of drugs are significantly larger than the additive impact of the same drugs applied alone. However, drug efficacy as well as drug combination efficacy significantly varies across individual tumors, making it challenging to test drug combinations one by one. In a scenario where you had extensive single-drug response data (similar to the data of this challenge given with individual drugs in this challenge), suggest an approach to prioritize drug combination candidates for pairs that have yet to be tested in combination. 300 words or less.
