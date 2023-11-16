@@ -6,9 +6,8 @@ from sklearn.metrics import make_scorer, f1_score, precision_score
 import os
 import json
 
-PROJECT_NAME = "Dream11"
+PROJECT_NAME = "LanternPharma-C2"
 ENTITY = None
-
 
 replace_venue_dict = {
     "M Chinnaswamy Stadium, Bangalore": "M Chinnaswamy Stadium",

@@ -36,6 +36,14 @@ from sklearn.model_selection import (
 from hyperparams import *
 from util import *
 
+DRUGS = {
+    0: "Rapamycin_response",
+    1: "Mitomycin_response",
+    2: "Fulvestrant_response",
+    3: "Gefitinib_response",
+    4: "Rapamycin-Gefitinib_response",
+    5: "Mitomycin-Fulvestrant_response",
+}
 RANDOM_STATE = 42
 warnings.filterwarnings("ignore")
 wandb.login()
@@ -43,7 +51,7 @@ wandb.login()
 # create argparser arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("model", type=str, default="lgbm")
-parser.add_argument("embedding", type=str, default="no")
+parser.add_argument("drug", type=str, default=0)
 parser.add_argument("environment", type=str, default="local")
 parser.add_argument("splits", type=int, default=3)
 parser.add_argument("iterations", type=int, default=1)
@@ -59,38 +67,26 @@ print("--------------------")
 if args.environment == "paperspace":
     os.chdir("/notebooks/Scripts")
 
+df = pd.read_csv("allTrain.tsv", sep="\t", low_memory=True)
+label = DRUGS[args.drug]
 # initialize wandb run
 if args.log == "yes":
     run = wandb.init(
         project=PROJECT_NAME,
         entity=ENTITY,
         job_type="modeling",
-        notes=f"Modelling the ipl2022 dataset with {clfs[args.model]} (5 classes) with feature embeddings={args.embedding}",
+        notes=f"Modelling the lantern pharma drug response dataset with {clfs[args.model]}",
         tags=[
             f"niter{args.iterations}",
             f"model{args.model}",
-            f"undersample_{args.usalgo}",
-            "ipl2022",
-            "5_classes",
+            f"oversample_{args.usalgo}",
+            f"Drug_{label}",
+            "2_classes",
             "custom_metrics",
         ],
     )
 
-if args.environment == "local":
-    if args.embedding == "yes":
-        train = pd.read_csv("../Inputs/ball-by-ball prediction/embfeats10K.csv")
-    else:
-        train = pd.read_csv("../Inputs/ball-by-ball prediction/ipl2022.csv")
-else:
-    if args.embedding == "yes":
-        train = pd.read_csv("embfeats10K.csv")
-    else:
-        train = pd.read_csv("ipl2022.csv")
-
-if args.embedding == "yes":
-    X_train, X_test, y_train, y_test, labels = get_train_test_split(train)
-else:
-    X_train, X_test, y_train, y_test, labels = get_train_test_split(train)
+X_train, X_test, y_train, y_test = get_train_test_split(df)
 
 
 def calc_metrics(rs, label_dict, training=True, metric="precision"):
@@ -168,6 +164,7 @@ pipe = imbPipeline(
 )
 
 # --------Custom Scorer---------#
+labels = ["Positive", "Negative"]
 label_dict = {i: labels[i] for i in range(len(labels))}
 important_classes = [0, 3, 4]
 custom_f1 = get_custom_scorer(important_classes)

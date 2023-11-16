@@ -100,14 +100,29 @@ def get_sampler(algo="tomek"):
         return None
 
 
-def get_train_test_split(df, target="target", test_size=0.1):
-    le = LabelEncoder()
-    X, y = df.drop(target, axis=1), le.fit_transform(df[target])
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, shuffle=True, random_state=RANDOM_STATE
+def get_train_test_split(df):
+    constant_columns = [col for col in df.columns if df[col].nunique() == 1]
+    df.type = pd.Categorical(df.type.astype("category"))
+    df.type = df.type.cat.codes
+    test_idx = [2, 4, 5, 13, 15, 19, 24, 30, 34, 36, 38, 40, 44, 46]
+    labels = df[
+        [
+            "Rapamycin_response",
+            "Mitomycin_response",
+            "Fulvestrant_response",
+            "Gefitinib_response",
+            "Rapamycin-Gefitinib_response",
+            "Mitomycin-Fulvestrant_response",
+        ]
+    ]
+    features = df.drop(columns=labels.columns.to_list() + constant_columns, axis=1)
+    X_train, X_test, y_train, y_test = (
+        features.drop(test_idx, axis=0).reset_index(drop=True),
+        features.iloc[features.index[test_idx]],
+        labels.drop(test_idx, axis=0).reset_index(drop=True),
+        labels.iloc[labels.index[test_idx]],
     )
-    X_train, X_test = X_train.reset_index(drop=True), X_test.reset_index(drop=True)
-    return X_train, X_test, y_train, y_test, le.classes_
+    return X_train, X_test, y_train, y_test
 
 
 # Split ipl2022 data into (pp,m,d) or power play (1-6), middle overs (7-15), death (15-20) to model them separately
