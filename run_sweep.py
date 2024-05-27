@@ -57,7 +57,7 @@ print("--------------------")
 # if args.environment == "paperspace":
 #     os.chdir("/notebooks/Scripts")
 
-df = pd.read_csv("allTrain.tsv", sep="\t", low_memory=True)
+df = pd.read_csv("Data/allTrain.tsv", sep="\t", low_memory=True)
 # initialize wandb run
 if args.log == "yes":
     run = wandb.init(
